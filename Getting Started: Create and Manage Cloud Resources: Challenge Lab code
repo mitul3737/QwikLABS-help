@@ -9,7 +9,15 @@ kubectl create deployment hello-app --image=gcr.io/google-samples/hello-app:2.0
 
 kubectl expose deployment hello-app --type=LoadBalancer --port 8080
 
-kubectl get service
+kubectl get service /*till the extertal IP address arrives*/
+
+cat << EOF > startup.sh
+#! /bin/bash
+apt-get update
+apt-get install -y nginx
+service nginx start
+sed -i -- 's/nginx/Google Cloud Platform - '"\$HOSTNAME"'/' /var/www/html/index.nginx-debian.html
+EOF
 
 gcloud compute instance-templates create nginx-template --metadata-from-file startup-script=startup.sh
 
